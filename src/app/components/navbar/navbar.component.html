@@ -1,0 +1,92 @@
+<mat-toolbar color="primary" class="navbar">
+  <button mat-button routerLink="/dashboard" class="toolbar-title">
+    <img src="assets/logo.png" alt="logo" *ngIf="false">
+    <span>Szálláshely foglalás</span>
+  </button>
+
+  <span class="spacer"></span>
+
+  <div class="desktop-menu">
+    <ng-container *ngIf="isLoggedIn$ | async">
+      <button mat-button routerLink="/dashboard" routerLinkActive="active">
+        <mat-icon>dashboard</mat-icon>
+        <span>Főoldal</span>
+      </button>
+      <button mat-button routerLink="/hotels" routerLinkActive="active">
+        <mat-icon>apartment</mat-icon>
+        <span>Hotelek</span>
+      </button>
+      <button mat-button routerLink="/rooms" routerLinkActive="active">
+        <mat-icon>hotel</mat-icon>
+        <span>Szobák</span>
+      </button>
+      <button mat-button routerLink="/bookings" routerLinkActive="active">
+        <mat-icon>book</mat-icon>
+        <span>Foglalások</span>
+      </button>
+    </ng-container>
+  </div>
+
+  <span class="spacer"></span>
+
+  <button mat-icon-button class="mobile-menu-button" (click)="toggleMobileMenu()">
+    <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+  </button>
+
+  <div class="desktop-menu">
+    <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
+      <button mat-button (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Kijelentkezés</span>
+      </button>
+    </ng-container>
+    <ng-template #loggedOut>
+      <button mat-button routerLink="/login">
+        <mat-icon>login</mat-icon>
+        <span>Bejelentkezés</span>
+      </button>
+    </ng-template>
+  </div>
+</mat-toolbar>
+
+<div class="mobile-menu" [class.open]="isMobileMenuOpen">
+  <ng-container *ngIf="isLoggedIn$ | async">
+    <button mat-button routerLink="/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">
+      <mat-icon>dashboard</mat-icon>
+      <span>Főoldal</span>
+    </button>
+    <button mat-button routerLink="/hotels" routerLinkActive="active" (click)="closeMobileMenu()">
+      <mat-icon>apartment</mat-icon>
+      <span>Hotelek</span>
+    </button>
+    <button mat-button routerLink="/rooms" routerLinkActive="active" (click)="closeMobileMenu()">
+      <mat-icon>hotel</mat-icon>
+      <span>Szobák</span>
+    </button>
+    <button mat-button routerLink="/bookings" routerLinkActive="active" (click)="closeMobileMenu()">
+      <mat-icon>book</mat-icon>
+      <span>Foglalások</span>
+    </button>
+    
+    <mat-divider></mat-divider>
+    
+    <button mat-button (click)="logout(); closeMobileMenu()">
+      <mat-icon>exit_to_app</mat-icon>
+      <span>Kijelentkezés</span>
+    </button>
+  </ng-container>
+  
+  <ng-container *ngIf="!(isLoggedIn$ | async)">
+    <button mat-button routerLink="/login" (click)="closeMobileMenu()">
+      <mat-icon>login</mat-icon>
+      <span>Bejelentkezés</span>
+    </button>
+    <button mat-button routerLink="/register" (click)="closeMobileMenu()">
+      <mat-icon>person_add</mat-icon>
+      <span>Regisztráció</span>
+    </button>
+  </ng-container>
+</div>
+
+<div class="mobile-menu-backdrop" *ngIf="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+

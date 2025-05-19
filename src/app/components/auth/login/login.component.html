@@ -1,0 +1,46 @@
+<div class="login-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title class="bejelentkezesTitle">Bejelentkezés</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-card-title>Email:</mat-card-title>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="Email">
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched">
+            Email cím megadása kötelező!
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">
+            Kérlek létező email címet adj meg.
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-card-title>Jelszó:</mat-card-title>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Jelszó</mat-label>
+          <input matInput formControlName="password" type="password" placeholder="Jelszó">
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
+            Jelszó megadása kötelező!
+          </mat-error>
+        </mat-form-field>
+        
+        <div class="button-container">
+          <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || isLoading">
+            <ng-container *ngIf="isLoading; else loginText">
+              <mat-spinner diameter="24"></mat-spinner>
+            </ng-container>
+            <ng-template #loginText>
+              Bejelentkezés
+            </ng-template>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+    <mat-card-actions>
+      <p>Nincs fiókod? <a routerLink="/register">Regisztrálj</a></p>
+    </mat-card-actions>
+  </mat-card>
+</div>
+

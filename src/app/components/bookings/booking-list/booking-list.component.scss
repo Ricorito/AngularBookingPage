@@ -1,0 +1,64 @@
+@use '../../../styles/shared' as shared;
+
+.booking-list-container {
+  @include shared.card-container;
+  padding: 15px;
+  
+  @media (max-width: 599px) {
+    padding: 10px;
+  }
+}
+
+.header {
+  @include shared.flex-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+  
+  h1 {
+    @media (max-width: 599px) {
+      font-size: 1.5rem;
+      width: 100%;
+    }
+  }
+  
+  button {
+    @media (max-width: 599px) {
+      width: 100%;
+    }
+  }
+}
+
+.filters {
+  @include shared.grid-responsive(250px);
+  margin-bottom: 20px;
+  
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    
+    @media (max-width: 768px) {
+      min-width: 800px; 
+    }
+  }
+}
+
+.status-confirmed {
+  @include shared.status-badge(shared.$status-confirmed-bg, shared.$status-confirmed-text);
+}
+
+.status-pending {
+  @include shared.status-badge(shared.$status-pending-bg, shared.$status-pending-text);
+}
+
+.status-cancelled {
+  @include shared.status-badge(shared.$status-cancelled-bg, shared.$status-cancelled-text);
+}
+

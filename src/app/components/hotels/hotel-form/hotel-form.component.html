@@ -1,0 +1,159 @@
+<div class="hotel-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditMode ? 'Hotel szerkesztése' : 'Új hotel hozzáadása' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ng-container *ngIf="isLoading; else formContent">
+        <div class="loading-spinner">
+          <mat-spinner></mat-spinner>
+        </div>
+      </ng-container>
+      
+      <ng-template #formContent>
+        <form [formGroup]="hotelForm" (ngSubmit)="onSubmit()">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Hotel neve</mat-label>
+              <input matInput formControlName="name" placeholder="Hotel neve">
+              <mat-error *ngIf="hotelForm.get('name')?.hasError('required') && hotelForm.get('name')?.touched">
+                A hotel neve kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Cím</mat-label>
+              <input matInput formControlName="address" placeholder="Cím">
+              <mat-error *ngIf="hotelForm.get('address')?.hasError('required') && hotelForm.get('address')?.touched">
+                A cím kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row location-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Város</mat-label>
+              <input matInput formControlName="city" placeholder="Város">
+              <mat-error *ngIf="hotelForm.get('city')?.hasError('required') && hotelForm.get('city')?.touched">
+                A város kötelező
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Ország</mat-label>
+              <input matInput formControlName="country" placeholder="Ország">
+              <mat-error *ngIf="hotelForm.get('country')?.hasError('required') && hotelForm.get('country')?.touched">
+                Az ország kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Leírás</mat-label>
+              <textarea matInput formControlName="description" rows="4" placeholder="Leírás"></textarea>
+              <mat-error *ngIf="hotelForm.get('description')?.hasError('required') && hotelForm.get('description')?.touched">
+                A leírás kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Csillagok száma</mat-label>
+              <input matInput type="number" formControlName="stars" min="1" max="5">
+              <mat-error *ngIf="hotelForm.get('stars')?.hasError('required') && hotelForm.get('stars')?.touched">
+                A csillagok száma kötelező
+              </mat-error>
+              <mat-error *ngIf="(hotelForm.get('stars')?.hasError('min') || hotelForm.get('stars')?.hasError('max')) && hotelForm.get('stars')?.touched">
+                A csillagok száma 1 és 5 között lehet
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <h3>Szolgáltatások</h3>
+            <div class="amenities-input">
+              <mat-form-field appearance="outline" class="amenity-field">
+                <mat-label>Új szolgáltatás</mat-label>
+                <input matInput [(ngModel)]="amenityInput" [ngModelOptions]="{standalone: true}" placeholder="Pl. WiFi, Medence, stb.">
+              </mat-form-field>
+              <button type="button" mat-mini-fab color="primary" (click)="addAmenity()">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+            
+            <div class="amenities-list" *ngIf="amenities.controls.length > 0">
+              <mat-chip-set>
+                <mat-chip *ngFor="let amenity of amenities.controls; let i = index" (removed)="removeAmenity(i)">
+                  {{ amenity.value }}
+                  <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <h3>Képek</h3>
+            <div formArrayName="images" class="images-container">
+              <div *ngFor="let image of images.controls; let i = index" class="image-input">
+                <mat-form-field appearance="outline" class="image-field">
+                  <mat-label>Kép URL {{ i + 1 }}</mat-label>
+                  <input matInput [formControlName]="i" placeholder="https://example.com/image.jpg">
+                </mat-form-field>
+                <button type="button" mat-icon-button color="warn" (click)="removeImage(i)" [disabled]="images.length === 1">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <button type="button" mat-stroked-button color="primary" (click)="addImage()">
+                <mat-icon>add_photo_alternate</mat-icon> Új kép hozzáadása
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-row contact-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="contactEmail" type="email" placeholder="Email">
+              <mat-error *ngIf="hotelForm.get('contactEmail')?.hasError('required') && hotelForm.get('contactEmail')?.touched">
+                Az email cím kötelező
+              </mat-error>
+              <mat-error *ngIf="hotelForm.get('contactEmail')?.hasError('email') && hotelForm.get('contactEmail')?.touched">
+                Érvénytelen email cím
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Telefonszám</mat-label>
+              <input matInput formControlName="contactPhone" placeholder="Telefonszám">
+              <mat-error *ngIf="hotelForm.get('contactPhone')?.hasError('required') && hotelForm.get('contactPhone')?.touched">
+                A telefonszám kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-actions">
+            <button mat-button type="button" routerLink="/hotels">Mégse</button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="hotelForm.invalid || isSubmitting"
+            >
+              <ng-container *ngIf="isSubmitting; else buttonText">
+                <mat-spinner diameter="24"></mat-spinner>
+              </ng-container>
+              <ng-template #buttonText>
+                {{ isEditMode ? 'Mentés' : 'Létrehozás' }}
+              </ng-template>
+            </button>
+          </div>
+        </form>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,97 @@
+<div class="room-list-container">
+  <div class="header">
+    <h1>Szobák</h1>
+    <button *ngIf="isAdmin$ | async" mat-raised-button color="primary" routerLink="/rooms/new">
+      <mat-icon>add</mat-icon> Új szoba
+    </button>
+  </div>
+  
+  <div class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Keresés</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="Keresés szobaszám vagy leírás szerint">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    
+    <mat-form-field appearance="outline">
+      <mat-label>Típus</mat-label>
+      <mat-select [formControl]="typeControl">
+        <mat-option value="">Összes</mat-option>
+        <mat-option value="single">Egyágyas</mat-option>
+        <mat-option value="double">Kétágyas</mat-option>
+        <mat-option value="suite">Lakosztály</mat-option>
+        <mat-option value="family">Családi</mat-option>
+      </mat-select>
+    </mat-form-field>
+    
+    <mat-form-field appearance="outline">
+      <mat-label>Elérhetőség</mat-label>
+      <mat-select [formControl]="availabilityControl">
+        <mat-option value="">Összes</mat-option>
+        <mat-option value="true">Elérhető</mat-option>
+        <mat-option value="false">Foglalt</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  
+  <div class="rooms-grid">
+    <ng-container *ngFor="let room of filteredRooms$ | async">
+      <mat-card [ngClass]="{'unavailable': !room.isAvailable}">
+        <div class="availability-badge" *ngIf="!room.isAvailable">
+          <mat-icon>do_not_disturb</mat-icon>
+          <span>Foglalt</span>
+        </div>
+        <img 
+          mat-card-image 
+          [src]="room.images && room.images.length > 0 ? room.images[0] : '/room.png'" 
+          [alt]="room.number"
+        >
+        <mat-card-content>
+          <div class="room-header">
+            <h2>{{ room.number }}</h2>
+            <div class="room-type">
+              {{ room.type === 'single' ? 'Egyágyas' : 
+                 room.type === 'double' ? 'Kétágyas' : 
+                 room.type === 'suite' ? 'Lakosztály' : 
+                 room.type === 'deluxe' ? 'Deluxe' : 
+                 room.type }}
+            </div>
+          </div>
+          <p class="price">{{ room.price | currency:'HUF':'symbol':'1.0-0' }} / éjszaka</p>
+          <p class="capacity">
+            <mat-icon>person</mat-icon> {{ room.capacity }} fő
+          </p>
+          <p class="description">{{ room.description | slice:0:100 }}{{ room.description.length > 100 ? '...' : '' }}</p>
+          <div class="amenities" *ngIf="room.amenities && room.amenities.length > 0">
+            <ng-container *ngFor="let amenity of room.amenities.slice(0, 3)">
+              <mat-chip>{{ amenity }}</mat-chip>
+            </ng-container>
+            <span *ngIf="room.amenities.length > 3" class="more-amenities">+{{ room.amenities.length - 3 }} több</span>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" [routerLink]="['/rooms', room.id]">
+            Részletek
+          </button>
+          <ng-container *ngIf="isAdmin$ | async">
+            <button mat-button color="accent" [routerLink]="['/rooms/edit', room.id]">
+              Szerkesztés
+            </button>
+            <button mat-button color="warn" (click)="deleteRoom(room.id)">
+              Törlés
+            </button>
+          </ng-container>
+        </mat-card-actions>
+      </mat-card>
+    </ng-container>
+  </div>
+  
+  <ng-container *ngIf="(filteredRooms$ | async)?.length === 0">
+    <div class="no-rooms">
+      <p>Nincs a keresési feltételeknek megfelelő szoba.</p>
+      <button mat-raised-button color="primary" (click)="resetFilters()">
+        Szűrők törlése
+      </button>
+    </div>
+  </ng-container>
+</div>

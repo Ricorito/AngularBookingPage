@@ -1,0 +1,209 @@
+<div class="hotel-detail-container" *ngIf="hotel$ | async as hotel">
+  <div class="header">
+    <h1>{{ hotel.name }}</h1>
+    <div class="stars">
+      <ng-container *ngFor="let star of [].constructor(hotel.stars)">
+        <mat-icon class="star-icon">star</mat-icon>
+      </ng-container>
+    </div>
+    <div class="actions" *ngIf="isAdmin$ | async">
+      <button mat-raised-button color="primary" [routerLink]="['/rooms/new']" [queryParams]="{hotelId: hotel.id}">
+        <mat-icon>add</mat-icon> Új szoba
+      </button>
+      <button mat-raised-button color="accent" [routerLink]="['/hotels/edit', hotel.id]">
+        <mat-icon>edit</mat-icon> Hotel szerkesztése
+      </button>
+    </div>
+  </div>
+  
+  <div class="hotel-content">
+    <mat-card class="hotel-info">
+      <mat-card-content>
+        <div class="location">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ hotel.address }}, {{ hotel.city }}, {{ hotel.country }}</span>
+        </div>
+        
+        <div class="contact">
+          <div>
+            <mat-icon>email</mat-icon>
+            <span>{{ hotel.contactEmail }}</span>
+          </div>
+          <div>
+            <mat-icon>phone</mat-icon>
+            <span>{{ hotel.contactPhone }}</span>
+          </div>
+        </div>
+        
+        <div class="description">
+          <h3>Leírás</h3>
+          <p>{{ hotel.description }}</p>
+        </div>
+        
+        <div class="amenities" *ngIf="hotel.amenities && hotel.amenities.length > 0">
+          <h3>Szolgáltatások</h3>
+          <div class="amenities-list">
+            <mat-chip *ngFor="let amenity of hotel.amenities">{{ amenity }}</mat-chip>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    
+    <mat-card class="hotel-gallery" *ngIf="hotel.images && hotel.images.length > 0">
+      <mat-card-content>
+        <h3>Képek</h3>
+        <div class="gallery">
+          <div class="gallery-item" *ngFor="let image of hotel.images">
+            <img [src]="image" [alt]="hotel.name">
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  
+  <mat-card class="rooms-section">
+    <mat-card-content>
+      <h2>Elérhető szobák</h2>
+      
+      <div class="rooms-grid">
+        <ng-container *ngFor="let room of rooms$ | async">
+          <mat-card [ngClass]="{'unavailable': !room.isAvailable, 'selected': selectedRoom?.id === room.id}" (click)="selectRoom(room)">
+            <div class="availability-badge" *ngIf="!room.isAvailable">
+              <mat-icon>do_not_disturb</mat-icon>
+              <span>Foglalt</span>
+            </div>
+            <img 
+              mat-card-image 
+              [src]="room.images && room.images.length > 0 ? room.images[0] : '/room.png'" 
+              [alt]="room.number"
+            >
+            <mat-card-content>
+              <div class="room-header">
+                <h3>{{ room.number }}</h3>
+                <div class="room-type">
+                  {{ room.type === 'single' ? 'Egyágyas' : 
+                     room.type === 'double' ? 'Kétágyas' : 
+                     room.type === 'suite' ? 'Lakosztály' : 
+                    room.type }}
+                </div>
+              </div>
+              <p class="price">{{ room.price | currency:'HUF':'symbol':'1.0-0' }} / éjszaka</p>
+              <p class="capacity">
+                <mat-icon>person</mat-icon> {{ room.capacity }} fő
+              </p>
+              <div class="amenities" *ngIf="room.amenities && room.amenities.length > 0">
+                <ng-container *ngFor="let amenity of room.amenities.slice(0, 2)">
+                  <mat-chip>{{ amenity }}</mat-chip>
+                </ng-container>
+                <span *ngIf="room.amenities.length > 2" class="more-amenities">+{{ room.amenities.length - 2 }} több</span>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary" [routerLink]="['/rooms', room.id]">
+                Részletek
+              </button>
+              <button mat-button color="accent" *ngIf="isAdmin$ | async" [routerLink]="['/rooms/edit', room.id]">
+                Szerkesztés
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </ng-container>
+      </div>
+      
+      <div class="no-rooms" *ngIf="(rooms$ | async)?.length === 0">
+        <p>Nincsenek elérhető szobák ebben a hotelben.</p>
+        <button mat-raised-button color="primary" *ngIf="isAdmin$ | async" [routerLink]="['/rooms/new']" [queryParams]="{hotelId: hotel.id}">
+          <mat-icon>add</mat-icon> Új szoba hozzáadása
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  
+  <mat-card class="booking-section" *ngIf="selectedRoom">
+    <mat-card-content>
+      <h2>Foglalás</h2>
+      
+      <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Érkezés dátuma</mat-label>
+            <input matInput [matDatepicker]="checkInPicker" formControlName="checkInDate" (dateChange)="onDateChange()">
+            <mat-datepicker-toggle matSuffix [for]="checkInPicker"></mat-datepicker-toggle>
+            <mat-datepicker #checkInPicker></mat-datepicker>
+            <mat-error *ngIf="bookingForm.get('checkInDate')?.hasError('required')">Érkezés dátuma kötelező</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Távozás dátuma</mat-label>
+            <input matInput [matDatepicker]="checkOutPicker" formControlName="checkOutDate" (dateChange)="onDateChange()">
+            <mat-datepicker-toggle matSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
+            <mat-datepicker #checkOutPicker></mat-datepicker>
+            <mat-error *ngIf="bookingForm.get('checkOutDate')?.hasError('required')">Távozás dátuma kötelező</mat-error>
+          </mat-form-field>
+        </div>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Vendég neve</mat-label>
+            <input matInput formControlName="guestName">
+            <mat-error *ngIf="bookingForm.get('guestName')?.hasError('required')">Vendég neve kötelező</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Vendég email címe</mat-label>
+            <input matInput formControlName="guestEmail" type="email">
+            <mat-error *ngIf="bookingForm.get('guestEmail')?.hasError('required')">Email cím kötelező</mat-error>
+            <mat-error *ngIf="bookingForm.get('guestEmail')?.hasError('email')">Érvénytelen email cím</mat-error>
+          </mat-form-field>
+        </div>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Vendég telefonszáma</mat-label>
+            <input matInput formControlName="guestPhone">
+            <mat-error *ngIf="bookingForm.get('guestPhone')?.hasError('required')">Telefonszám kötelező</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Vendégek száma</mat-label>
+            <input matInput type="number" formControlName="numberOfGuests" min="1" [max]="selectedRoom.capacity">
+            <mat-error *ngIf="bookingForm.get('numberOfGuests')?.hasError('required')">Vendégek száma kötelező</mat-error>
+            <mat-error *ngIf="bookingForm.get('numberOfGuests')?.hasError('min')">Legalább 1 vendég szükséges</mat-error>
+            <mat-error *ngIf="bookingForm.get('numberOfGuests')?.hasError('max')">Túl sok vendég a szoba kapacitásához képest</mat-error>
+          </mat-form-field>
+        </div>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Különleges kérések</mat-label>
+          <textarea matInput formControlName="specialRequests" rows="3"></textarea>
+        </mat-form-field>
+        
+        <div class="booking-summary">
+          <div class="summary-item">
+            <span>Szoba:</span>
+            <span>{{ selectedRoom.number }} ({{ selectedRoom.type === 'single' ? 'Egyágyas' : 
+                                              selectedRoom.type === 'double' ? 'Kétágyas' : 
+                                              selectedRoom.type === 'suite' ? 'Lakosztály' : 
+                                              selectedRoom.type }})</span>
+          </div>
+          <div class="summary-item">
+            <span>Éjszakák száma:</span>
+            <span>{{ numberOfNights }}</span>
+          </div>
+          <div class="summary-item total">
+            <span>Teljes ár:</span>
+            <span>{{ totalPrice | currency:'HUF':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="bookingForm.invalid || isSubmitting">
+            <mat-icon>book_online</mat-icon>
+            Foglalás
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+

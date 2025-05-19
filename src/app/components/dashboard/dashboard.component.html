@@ -1,0 +1,129 @@
+<div class="dashboard-container">
+  <h1>Üdvözöllek {{ userName }}!</h1>
+
+  <section class="hotel-banner" appSimpleSlider>
+    <div class="banner-content">
+      <div class="banner-image">
+        <ng-container *ngIf="currentFeaturedHotel; else defaultHotelImage">
+          <img [src]="currentFeaturedHotel.images && currentFeaturedHotel.images.length > 0 ? currentFeaturedHotel.images[0] : '/hotel.png'" [alt]="currentFeaturedHotel.name">
+        </ng-container>
+        <ng-template #defaultHotelImage>
+          <img src="/hotel.png" alt="hotel.png">
+        </ng-template>
+      </div>
+      <div class="banner-text">
+        <ng-container *ngIf="currentFeaturedHotel;">
+          <h1>{{ currentFeaturedHotel.name }}</h1>
+          <p class="promo">{{ currentFeaturedHotel.stars }} csillagos szálloda | {{ currentFeaturedHotel.city }}, {{ currentFeaturedHotel.country }}</p>
+          <p class="description">{{ currentFeaturedHotel.description }}</p>
+          <button class="book-button" mat-button [routerLink]="['/hotels', currentFeaturedHotel.id]" routerLinkActive="active"><p appFoglalasDirective>Foglalj most!</p></button>
+          <p class="contact">Kapcsolat: {{ currentFeaturedHotel.contactPhone }}</p>
+        </ng-container>
+      </div>
+    </div>
+  </section>
+
+  <div class="room-gallery">
+    <h2>Ajánlataink</h2>
+    <div class="gallery-grid">
+
+      <ng-container *ngIf="featuredRooms$ | async as featuredRooms;">
+        <div class="room-card" *ngFor="let room of featuredRooms">
+          <img [src]="room.image" [alt]="room.name" />
+          <div class="room-info">
+            <h3>{{ room.name }}</h3>
+            <p *ngIf="room.hotelName">{{ room.hotelName }}</p>
+            <button mat-stroked-button 
+              [routerLink]="room.id ? ['/rooms', room.id] : room.hotelId ? ['/hotels', room.hotelId] : ['/rooms']">
+            <p appReszletekDirective>Részletek</p>            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="stats-cards">
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>hotel</mat-icon>
+        <mat-card-title>Összes szoba</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2>{{ (rooms$ | async)?.length || 0 }}</h2>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="#000" routerLink="/rooms">Összes szoba megtekintése</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>book</mat-icon>
+        <mat-card-title>Aktív foglalások</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2>{{ activeBookingsCount$ | async }}</h2>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="#000" routerLink="/bookings">Összes foglalás megtekintése</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>meeting_room</mat-icon>
+        <mat-card-title>Szabad szobáink</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2>{{ availableRoomsCount$ | async }}</h2>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="primary" routerLink="/rooms">Összes szabad szoba megtekintése</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Korábbi foglalások -->
+  <div class="recent-bookings">
+    <h2 class="text-szin">Korábbi foglalásaim</h2>
+    <ng-container *ngIf="(recentBookings$ | async)?.length; else noBookings">
+      <div class="bookings-list">
+        <ng-container *ngFor="let booking of recentBookings$ | async">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>{{ booking.guestName }}</mat-card-title>
+              <mat-card-subtitle>
+                Check-in: {{ booking.checkInDate | date:'mediumDate' }} |
+                Check-out: {{ booking.checkOutDate | date:'mediumDate' }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Room:</strong> {{ booking.roomDetails?.number || 'Loading...' }}</p>
+              <p><strong>Status:</strong>
+                <span [ngClass]="{
+                  'status-confirmed': booking.status === 'confirmed',
+                  'status-pending': booking.status === 'pending',
+                  'status-cancelled': booking.status === 'cancelled'
+                }">{{ booking.status }}</span>
+              </p>
+              <p><strong>Total:</strong> ${{ booking.totalPrice }}</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary" [routerLink]="['/bookings/edit', booking.id]">Edit</button>
+              <button
+                mat-button
+                color="warn"
+                (click)="cancelBooking(booking.id!)"
+                [disabled]="booking.status === 'cancelled'">
+                Cancel
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </ng-container>
+      </div>
+    </ng-container>
+    <ng-template #noBookings>
+      <p>Nem látok korábbi foglalást.</p>
+    </ng-template>
+  </div>
+</div>

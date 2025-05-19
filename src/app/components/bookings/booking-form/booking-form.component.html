@@ -1,0 +1,151 @@
+<div class="booking-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title style="font-size: 24px; padding-bottom: 15px;">{{ isEditMode ? 'Foglalás szerkesztése' : 'Új foglalás' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ng-container *ngIf="isLoading; else formContent">
+        <div class="loading-spinner">
+          <mat-spinner></mat-spinner>
+        </div>
+      </ng-container>
+      <ng-template #formContent>
+        <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+          <div class="form-row">
+            <mat-card-title style="font-size: 16px;">Teljes név:</mat-card-title>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Vendég neve</mat-label>
+              <input matInput formControlName="guestName" placeholder="Vendég neve">
+              <mat-error *ngIf="bookingForm.get('guestName')?.hasError('required') && bookingForm.get('guestName')?.touched">
+                A név megadása kötelező!
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          
+          <div class="form-row">
+            <mat-card-title style="font-size: 16px; padding: 0; margin: 0;">Email:</mat-card-title>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email cím</mat-label>
+              <input matInput formControlName="guestEmail" type="email" placeholder="Vendég Email">
+              <mat-error *ngIf="bookingForm.get('guestEmail')?.hasError('required') && bookingForm.get('guestEmail')?.touched">
+                Az email megadása kötelező!
+              </mat-error>
+              <mat-error *ngIf="bookingForm.get('guestEmail')?.hasError('email') && bookingForm.get('guestEmail')?.touched">
+                Kérlek megfelelő email címet adj meg!
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-card-title style="font-size: 16px;">Telefonszám:</mat-card-title>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Telefonszám</mat-label>
+              <input matInput formControlName="guestPhone" placeholder="Vendég Telefonszám">
+              <mat-error *ngIf="bookingForm.get('guestPhone')?.hasError('required') && bookingForm.get('guestPhone')?.touched">
+                Telefonszám megadása kötelező!
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-card-title style="font-size: 16px;">Válassz szobát:</mat-card-title>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Szoba</mat-label>
+              <mat-select formControlName="roomId" (selectionChange)="onRoomSelected($event.value)">
+                <ng-container *ngFor="let room of availableRooms$ | async">
+                  <mat-option [value]="room.id">
+                    {{ room.number }} - {{ room.type }} ({{ room.price | currency:'HUF':'symbol':'1.0-0' }}/éjszaka)
+                  </mat-option>
+                </ng-container>
+              </mat-select>
+              <mat-error *ngIf="bookingForm.get('roomId')?.hasError('required') && bookingForm.get('roomId')?.touched">
+                Szobaválasztás kötelező!
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row date-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Érkezés napja</mat-label>
+              <input matInput 
+                     [matDatepicker]="checkInPicker" 
+                     formControlName="checkInDate"
+                     (dateChange)="calculateTotalPrice(bookingForm.get('checkInDate')?.value, bookingForm.get('checkOutDate')?.value)">
+              <mat-datepicker-toggle matSuffix [for]="checkInPicker"></mat-datepicker-toggle>
+              <mat-datepicker #checkInPicker></mat-datepicker>
+              <mat-error *ngIf="bookingForm.get('checkInDate')?.hasError('required') && bookingForm.get('checkInDate')?.touched">
+                Érkezés napját kötelező megadni.
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Távozás napja</mat-label>
+              <input matInput 
+                     [matDatepicker]="checkOutPicker" 
+                     formControlName="checkOutDate"
+                     (dateChange)="calculateTotalPrice(bookingForm.get('checkInDate')?.value, bookingForm.get('checkOutDate')?.value)">
+              <mat-datepicker-toggle matSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
+              <mat-datepicker #checkOutPicker></mat-datepicker>
+              <mat-error *ngIf="bookingForm.get('checkOutDate')?.hasError('required') && bookingForm.get('checkOutDate')?.touched">
+                Távozás napját kötelező megadni.
+              </mat-error>
+              <mat-error *ngIf="bookingForm.hasError('dateRangeInvalid')">
+                A távozás dátuma később kell legyen, mint az érkezésé!
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Teljes ár</mat-label>
+              <input matInput 
+                     formControlName="totalPrice" 
+                     type="text" 
+                     placeholder="Teljes ár" 
+                     readonly
+                     [value]="bookingForm.get('totalPrice')?.value | currency:'HUF':'symbol':'1.0-0'">
+              <mat-error *ngIf="bookingForm.get('totalPrice')?.hasError('required')">
+                Ár kiszámítása szükséges
+              </mat-error>
+              <mat-error *ngIf="bookingForm.get('totalPrice')?.hasError('min')">
+                Az árnak nagyobbnak kell lennie 0-nál
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <ng-container *ngIf="isEditMode">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Állapot</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="confirmed">Megerősítve</mat-option>
+                  <mat-option value="pending">Függőben</mat-option>
+                  <mat-option value="cancelled">Törölve</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </ng-container>
+          
+          <div class="form-actions">
+            <button mat-button type="button" routerLink="/bookings">Vissza</button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="bookingForm.invalid || isSubmitting"
+            >
+              <ng-container *ngIf="isSubmitting; else buttonText">
+                <mat-spinner diameter="24"></mat-spinner>
+              </ng-container>
+              <ng-template #buttonText>
+                {{ isEditMode ? 'Frissítés' : 'Foglalás' }} 
+              </ng-template>
+            </button>
+          </div>
+        </form>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</div>
+

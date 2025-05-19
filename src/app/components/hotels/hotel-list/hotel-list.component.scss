@@ -1,0 +1,180 @@
+@use '../../../styles/shared' as shared;
+
+.hotel-list-container {
+  @include shared.card-container;
+  padding: 15px;
+  
+  @media (max-width: 599px) {
+    padding: 10px;
+  }
+}
+
+.header {
+  @include shared.flex-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  h1 {
+    @media (max-width: 599px) {
+      font-size: 1.5rem;
+      width: 100%;
+    }
+  }
+
+  button {
+    @media (max-width: 599px) {
+      width: 100%;
+    }
+  }
+}
+
+.filters {
+  @include shared.grid-responsive(250px);
+  margin-bottom: 20px;
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr !important; // Ne legyenek kétoszlopos elrendezések
+  }
+
+  .custom-select-container {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .custom-select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      background-color: white;
+      font-size: 16px;
+
+      &:focus {
+        outline: none;
+        border-color: shared.$primary-color;
+      }
+
+      mat-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 4px;
+        background-color: white;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+
+      mat-select .mat-select-trigger {
+        padding: 10px;
+      }
+
+      mat-select .mat-select-arrow {
+        top: 50%;
+      }
+    }
+  }
+}
+
+.hotels-grid {
+  @include shared.grid-responsive(300px);
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr !important; // Ne legyenek kétoszlopos elrendezések
+  }
+
+  mat-card {
+    img {
+      width: 100%;        // A kép kitölti a teljes szélességet
+      height: auto;       // A magasság arányos marad
+      object-fit: cover;  // A kép kitölti a rendelkezésre álló teret, megtartva az arányokat
+      max-height: 200px;  // Ha szeretnéd korlátozni a magasságot
+    }
+  }
+}
+
+.hotel-header {
+  @include shared.flex-between;
+  margin-bottom: 8px;
+  align-items: flex-start;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    flex: 1;
+
+    @media (max-width: 599px) {
+      font-size: 1.1rem;
+    }
+  }
+
+  .stars {
+    display: flex;
+
+    .star-icon {
+      color: #FFD700;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.location {
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.description {
+  margin-bottom: 12px;
+  line-height: 1.4;
+  color: #333;
+}
+
+.amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+
+  .more-amenities {
+    font-size: 0.8rem;
+    color: #666;
+    align-self: center;
+  }
+}
+
+.no-hotels {
+  text-align: center;
+  padding: 40px;
+
+  @media (max-width: 599px) {
+    padding: 20px;
+  }
+
+  button {
+    @media (max-width: 599px) {
+      width: 100%;
+    }
+  }
+}
+
+mat-card-actions {
+  @media (max-width: 599px) {
+    display: flex;
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      margin-bottom: 8px;
+    }
+  }
+}

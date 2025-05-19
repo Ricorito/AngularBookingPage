@@ -1,0 +1,153 @@
+<div class="room-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditMode ? 'Szoba szerkesztése' : 'Új szoba hozzáadása' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ng-container *ngIf="isLoading; else formContent">
+        <div class="loading-spinner">
+          <mat-spinner></mat-spinner>
+        </div>
+      </ng-container>
+      
+      <ng-template #formContent>
+        <form [formGroup]="roomForm" (ngSubmit)="onSubmit()">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Hotel</mat-label>
+              <mat-select formControlName="hotelId">
+                <mat-option *ngFor="let hotel of hotels$ | async" [value]="hotel.id">
+                  {{ hotel.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="roomForm.get('hotelId')?.hasError('required') && roomForm.get('hotelId')?.touched">
+                Hotel kiválasztása kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Szobaszám</mat-label>
+              <input matInput formControlName="number" placeholder="Szobaszám">
+              <mat-error *ngIf="roomForm.get('number')?.hasError('required') && roomForm.get('number')?.touched">
+                Szobaszám kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Szoba típusa</mat-label>
+              <mat-select formControlName="type">
+                <mat-option value="Egyágyas">Egyágyas</mat-option>
+                <mat-option value="Kétágyas">Kétágyas</mat-option>
+                <mat-option value="Lakosztály">Lakosztály</mat-option>
+                <mat-option value="Deluxe">Deluxe</mat-option>
+              </mat-select>
+              <mat-error *ngIf="roomForm.get('type')?.hasError('required') && roomForm.get('type')?.touched">
+                Szoba típusa kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row price-capacity-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Ár / éjszaka (Ft)</mat-label>
+              <input matInput type="number" formControlName="price" min="0">
+              <mat-error *ngIf="roomForm.get('price')?.hasError('required') && roomForm.get('price')?.touched">
+                Ár kötelező
+              </mat-error>
+              <mat-error *ngIf="roomForm.get('price')?.hasError('min') && roomForm.get('price')?.touched">
+                Az ár nem lehet negatív
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Férőhelyek száma</mat-label>
+              <input matInput type="number" formControlName="capacity" min="1">
+              <mat-error *ngIf="roomForm.get('capacity')?.hasError('required') && roomForm.get('capacity')?.touched">
+                Férőhelyek száma kötelező
+              </mat-error>
+              <mat-error *ngIf="roomForm.get('capacity')?.hasError('min') && roomForm.get('capacity')?.touched">
+                Legalább 1 férőhely szükséges
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Leírás</mat-label>
+              <textarea matInput formControlName="description" rows="4" placeholder="Leírás"></textarea>
+              <mat-error *ngIf="roomForm.get('description')?.hasError('required') && roomForm.get('description')?.touched">
+                Leírás kötelező
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <h3>Szolgáltatások</h3>
+            <div class="amenities-input">
+              <mat-form-field appearance="outline" class="amenity-field">
+                <mat-label>Új szolgáltatás</mat-label>
+                <input matInput [(ngModel)]="amenityInput" [ngModelOptions]="{standalone: true}" placeholder="Pl. WiFi, TV, stb.">
+              </mat-form-field>
+              <button type="button" mat-mini-fab color="primary" (click)="addAmenity()">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+            
+            <div class="amenities-list" *ngIf="amenities.controls.length > 0">
+              <mat-chip-set>
+                <mat-chip *ngFor="let amenity of amenities.controls; let i = index" (removed)="removeAmenity(i)">
+                  {{ amenity.value }}
+                  <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <h3>Képek</h3>
+            <div formArrayName="images" class="images-container">
+              <div *ngFor="let image of images.controls; let i = index" class="image-input">
+                <mat-form-field appearance="outline" class="image-field">
+                  <mat-label>Kép URL {{ i + 1 }}</mat-label>
+                  <input matInput [formControlName]="i" placeholder="https://example.com/image.jpg">
+                </mat-form-field>
+                <button type="button" mat-icon-button color="warn" (click)="removeImage(i)" [disabled]="images.length === 1">
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <img *ngIf="image.value" [src]="image.value" alt="Preview" class="image-preview"/>
+              </div>
+              <input type="file" (change)="onFileSelected($event)" multiple accept="image/*" />
+              <button type="button" mat-stroked-button color="primary" (click)="addImage()">
+                <mat-icon>add_photo_alternate</mat-icon> Új kép hozzáadása
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button mat-button type="button" [routerLink]="preselectedHotelId ? ['/hotels', preselectedHotelId] : ['/rooms']">Mégse</button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="roomForm.invalid || isSubmitting"
+            >
+              <ng-container *ngIf="isSubmitting; else buttonText">
+                <mat-spinner diameter="24"></mat-spinner>
+              </ng-container>
+              <ng-template #buttonText>
+                {{ isEditMode ? 'Mentés' : 'Létrehozás' }}
+              </ng-template>
+            </button>
+          </div>
+        </form>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</div>
+

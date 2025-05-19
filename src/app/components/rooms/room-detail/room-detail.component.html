@@ -1,0 +1,113 @@
+<div class="room-detail-container">
+  <ng-container *ngIf="room$ | async as room; else loading">
+    <div class="room-header">
+      <h1>Szoba {{ room.number }}</h1>
+      <div class="actions">
+        <button mat-raised-button color="primary" [routerLink]="['/bookings/new']" [queryParams]="{roomId: room.id}">
+          Foglalj most!
+        </button>
+        <button mat-button color="accent" [routerLink]="['/rooms']">
+          Vissza a szobákhoz
+        </button>
+      </div>
+    </div>
+    
+    <div class="room-content">
+      <div class="room-images">
+        <ng-container *ngIf="room.images && room.images.length > 0; else placeholderImage">
+          <div class="image-gallery">
+            <ng-container *ngFor="let image of room.images">
+              <img [src]="image" alt="Room image">
+            </ng-container>
+          </div>
+        </ng-container>
+        <ng-template #placeholderImage>
+          <img 
+            src="https://via.placeholder.com/800x400?text=Room+{{ room.number }}" 
+            alt="Room {{ room.number }}"
+            class="main-image"
+          >
+        </ng-template>
+      </div>
+      
+      <div class="room-info">
+        <mat-card>
+          <mat-card-content>
+            <div class="info-header">
+              <div>
+                <h2>{{ room.type | titlecase }} Szoba</h2>
+                <p class="price">{{ room.price }} HUF/éj</p>
+              </div>
+              <span 
+                class="availability-badge" 
+                [ngClass]="room.isAvailable ? 'available' : 'unavailable'"
+              >
+                {{ room.isAvailable ? 'Elérhető' : 'Nem elérhető' }}
+              </span>
+            </div>
+            
+            <mat-divider class="divider"></mat-divider>
+            
+            <div class="details">
+              <p><strong>Férőhelyek száma:</strong> {{ room.capacity }} {{ room.capacity > 1 ? 'persons' : 'person' }}</p>
+              <p><strong>Leírás:</strong> {{ room.description }}</p>
+            </div>
+            
+            <mat-divider class="divider"></mat-divider>
+            
+            <div class="amenities">
+              <h3>Szolgáltatások</h3>
+              <div class="amenities-list">
+                <ng-container *ngFor="let amenity of room.amenities">
+                  <mat-chip>{{ amenity }}</mat-chip>
+                </ng-container>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+    
+    <mat-tabs>
+      <mat-tab label="Upcoming Bookings">
+        <ng-container *ngIf="(roomBookings$ | async)?.length; else noBookings">
+          <mat-list>
+            <ng-container *ngFor="let booking of roomBookings$ | async">
+              <mat-list-item>
+                <div class="booking-item">
+                  <div>
+                    <h3>{{ booking.guestName }}</h3>
+                    <p>{{ booking.checkInDate | date:'mediumDate' }} to {{ booking.checkOutDate | date:'mediumDate' }}</p>
+                  </div>
+                  <span 
+                    class="status-badge" 
+                    [ngClass]="{
+                      'status-confirmed': booking.status === 'confirmed',
+                      'status-pending': booking.status === 'pending',
+                      'status-cancelled': booking.status === 'cancelled'
+                    }"
+                  >
+                    {{ booking.status }}
+                  </span>
+                </div>
+              </mat-list-item>
+              <mat-divider></mat-divider>
+            </ng-container>
+          </mat-list>
+        </ng-container>
+        <ng-template #noBookings>
+          <div class="no-bookings">
+            <p>Nincsennek aktív fogalálosok erre a szobára.</p>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tabs>
+  </ng-container>
+  
+  <ng-template #loading>
+    <div class="loading">
+      <p>Szoba adatok betöltése...</p>
+    </div>
+  </ng-template>
+</div>
+

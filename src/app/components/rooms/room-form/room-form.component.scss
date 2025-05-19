@@ -1,0 +1,102 @@
+@use '../../../styles/shared' as shared;
+
+.room-form-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  
+  @media (max-width: 599px) {
+    padding: 10px;
+  }
+}
+
+.form-row {
+  margin-bottom: 16px;
+}
+
+.image-preview {
+  width: 100px;
+  height: auto;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.price-capacity-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.amenities-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  
+  .amenity-field {
+    flex: 1;
+  }
+}
+
+.amenities-list {
+  margin-bottom: 16px;
+}
+
+.images-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  
+  .image-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+    .image-field {
+      flex: 1;
+    }
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+  
+  @media (max-width: 599px) {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+h3 {
+  margin-bottom: 10px;
+  color: shared.$primary-color;
+  font-weight: 500;
+  
+  @media (max-width: 599px) {
+    font-size: 1.1rem;
+  }
+}
+

@@ -1,0 +1,143 @@
+@use '../../../styles/shared' as shared;
+
+.room-list-container {
+  @include shared.card-container;
+  padding: 15px;
+
+  @media (max-width: 599px) {
+    padding: 10px;
+  }
+}
+
+.header {
+  @include shared.flex-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  h1 {
+    @media (max-width: 599px) {
+      font-size: 1.5rem;
+      width: 100%;
+    }
+  }
+
+  button {
+    @media (max-width: 599px) {
+      width: 100%;
+    }
+  }
+}
+
+.filters {
+  @include shared.grid-responsive(250px);
+  margin-bottom: 20px;
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rooms-grid {
+  @include shared.grid-responsive(300px);
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+  }
+
+  mat-card {
+    display: flex; 
+    flex-direction: column; 
+
+    img {
+      width: 100%; 
+      height: 200px; 
+      object-fit: cover; 
+      border-radius: inherit;
+    }
+
+    mat-card-content {
+      flex-grow: 1; 
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between; 
+    }
+  }
+}
+
+.room-header {
+  @include shared.flex-between;
+  margin-bottom: 8px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+
+    @media (max-width: 599px) {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.availability-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.available {
+  background-color: shared.$status-confirmed-bg;
+  color: shared.$status-confirmed-text;
+}
+
+.unavailable {
+  background-color: shared.$status-cancelled-bg;
+  color: shared.$status-cancelled-text;
+}
+
+.room-type {
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.room-price {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.no-rooms {
+  text-align: center;
+  padding: 40px;
+
+  @media (max-width: 599px) {
+    padding: 20px;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+mat-card-actions {
+  @media (max-width: 599px) {
+    display: flex;
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      margin-bottom: 8px;
+    }
+  }
+}
