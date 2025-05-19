@@ -1,7 +1,7 @@
 @use '../../../styles/shared' as shared;
 
 .register-container {
-  background-image: url('/HotelBooking-Angular-Firebase/background.jpg'); 
+  background-image: url('/HotelBooking-Angular-Firebase/background.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -9,21 +9,27 @@
   justify-content: center;
   align-items: center;
   height: calc(100vh - 64px);
-  padding: 20px;
-  
+  padding: 20px; 
+
+  @media (min-width: 600px) { 
+    padding: 130px;
+    height: calc(100vh - 64px); 
+  }
+
   @media (max-width: 599px) {
     height: calc(100vh - 56px);
-    padding: 10px;
+    padding: 15px; 
+    padding-top:130px;
   }
 }
 
 .titleRegister {
   font-size: 38px;
-  justify-content: center; 
-  align-items: center; 
+  justify-content: center;
+  align-items: center;
   text-align: center;
   margin-bottom: 20px;
-  
+
   @media (max-width: 599px) {
     font-size: 28px;
     margin-bottom: 15px;
@@ -34,14 +40,16 @@ mat-card {
   border-color: black;
   border-style: solid;
   border-radius: 25px;
-  width: 100%;
+  width: 95%; /* Kisebb alapértelmezett szélesség, hogy legyen némi margó kisebb képernyőkön */
   max-width: 400px;
   padding: 20px;
   opacity: 0.9;
-  
+
   @media (max-width: 599px) {
     padding: 15px;
     border-radius: 15px;
+    width: 100%; /* Teljes szélesség a kisebb képernyőkön */
+    max-width: none; /* Nincs maximális szélesség a kisebb képernyőkön */
   }
 }
 
@@ -53,7 +61,7 @@ mat-card {
 .button-container {
   display: flex;
   justify-content: flex-end;
-  
+
   @media (max-width: 599px) {
     button {
       width: 100%;
@@ -64,6 +72,12 @@ mat-card {
 mat-card-actions {
   display: flex;
   justify-content: center;
+  gap: 10px; /* Hely a gombok között */
+  flex-direction: row; /* Alapértelmezetten sorban */
+
+  @media (max-width: 399px) { /* Még kisebb képernyőkre oszlopba rendezzük a gombokat */
+    flex-direction: column;
+  }
 }
 
 mat-label {
@@ -84,8 +98,8 @@ h4 {
   color: black;
   cursor: pointer;
   position: relative;
-  overflow: hidden; 
-  
+  overflow: hidden;
+
   @media (max-width: 599px) {
     width: 100%;
     padding: 8px;
@@ -99,13 +113,13 @@ h4 {
   bottom: 0;
   left: 0;
   width: 0;
-  height: 2px; 
-  background-color: black; 
-  transition: width 0.3s ease-in-out; 
+  height: 2px;
+  background-color: black;
+  transition: width 0.3s ease-in-out;
 }
 
 .terms-button:hover::after {
-  width: 100%; 
+  width: 100%;
 }
 
 mat-card-title {
@@ -113,7 +127,7 @@ mat-card-title {
   align-items: center;
   justify-content: center;
   text-align: left;
-  
+
   @media (max-width: 599px) {
     font-size: 16px;
   }
@@ -123,10 +137,9 @@ mat-radio-group {
   display: flex;
   gap: 15px;
   margin-bottom: 15px;
-  
+
   @media (max-width: 599px) {
     flex-direction: column;
     gap: 8px;
   }
 }
-
