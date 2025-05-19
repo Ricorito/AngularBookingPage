@@ -1,3 +1,6 @@
+# URL
+  https://ricorito.github.io/HotelBooking-Angular-Firebase/login?returnUrl=%2Fdashboard
+
 # SzallasFoglalo
 Előre regisztrált admin user
   - email: admin@admin.com
