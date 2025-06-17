@@ -1,3 +1,5 @@
+# UPDATE 2025.06.17
+A site nem csatlakozik többé Google adatbázishoz, ezért a regisztráció/bejelentkezés nem müködik. 
 # URL
   https://ricorito.github.io/HotelBooking-Angular-Firebase/login?returnUrl=%2Fdashboard
 
