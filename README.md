@@ -1,12 +1,13 @@
 # UPDATE 2025.06.17
 A site nem csatlakozik többé Google adatbázishoz, ezért a regisztráció/bejelentkezés nem müködik. 
+The site is no longer connected to Google DB, register/login throw query & server error.
 # URL
   https://ricorito.github.io/HotelBooking-Angular-Firebase/login?returnUrl=%2Fdashboard
 
 # SzallasFoglalo
-Előre regisztrált admin user
+Előre regisztrált admin user / Pre-definied admin user
   - email: admin@admin.com
-  - jelszó: admin1
+  - jelszó/password : admin1
 
 #### A project Firestore Realtime Database-t használ, ezért a query-k eltérnek a megszokottól, kérlek ezt vedd figyelembe! :) Ezt leszámitva van összetett lekérdezés, Város + Foglalási nap szerinti keresés, Felhasználó szerinti keresés, Orderby időrendbe helyezés stb.
 
