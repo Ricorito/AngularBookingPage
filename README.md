@@ -1,5 +1,4 @@
 # UPDATE 2025.06.17
-A site nem csatlakozik többé Google adatbázishoz, ezért a regisztráció/bejelentkezés nem müködik. 
 The site is no longer connected to Google DB, register/login throw query & server error.
 # URL
   https://ricorito.github.io/HotelBooking-Angular-Firebase/login?returnUrl=%2Fdashboard
